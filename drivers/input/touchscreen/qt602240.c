@@ -60,6 +60,11 @@ static bool cal_check_flag = false;
 static unsigned int qt_time_point=0;
 static unsigned int qt_time_diff=0;
 static unsigned int qt_timer_state =0;
+#if defined (LED_SWITCH)
+static unsigned int p_time_point=0;
+static unsigned int p_time_diff=0;
+static int led_sw= 1;
+#endif
 
 #if defined (KEY_LED_CONTROL)
 void led_control(int data)
@@ -211,6 +216,15 @@ static struct bln_implementation p1_touchkey_bln = {
   .disable = p1_touchkey_bln_disable,
 };
 #endif
+
+static int press_time(void)
+{
+    p_time_diff = jiffies_to_msecs(jiffies) - p_time_point;
+    if(p_time_diff >2000)
+    	return 1;
+    else
+    	return 0;
+}
 
 #if defined(DRIVER_FILTER)
 #if defined (CONFIG_TARGET_LOCALE_KOR) || defined (CONFIG_TARGET_LOCALE_USAGSM)
@@ -1245,11 +1259,33 @@ static void qt602240_input_read(struct qt602240_data *data)
 				input_report_key(input_dev, tsp_keycodes[i], 0);
 				input_sync(input_dev);
 				tsp_keystatus[i] = KEY_RELEASE;
+#if defined (LED_SWITCH)
+				if(i == 0) {
+					if(p_time_point > 0) {
+						if(press_time()){
+							if (led_sw){
+								touch_led_on(false);
+								led_sw= 0;
+							} else {
+								init_led();
+								touch_led_on(255);
+								led_sw= 1;
+							}
+						}
+					}
+					p_time_point= 0;
+				}
+#endif
 			} else if (message->message[1] & (0x1<<i) ) {
 				if(message->message[0] & 0x80) {                                  // detect
 					input_report_key(input_dev, tsp_keycodes[i], 1);
 					input_sync(input_dev);
 					tsp_keystatus[i] = KEY_PRESS;
+#if defined (LED_SWITCH)
+					if(i == 0) {
+						p_time_point = jiffies_to_msecs(jiffies);
+					}
+#endif
 				}
 			}
 		}
@@ -2315,6 +2351,9 @@ static int __devinit qt602240_probe(struct i2c_client *client,
 #if defined(KEY_LED_SELF)
     touch_led_on(255);
 #endif
+#if defined(LED_SWITCH)
+    led_sw= 1;
+#endif
 	
     leds_class = class_create(THIS_MODULE, "leds");
     if (IS_ERR(leds_class))
@@ -2451,12 +2490,18 @@ static int qt602240_resume(struct i2c_client *client)
     }
     calibrate_chip(data);
 
+#if defined (LED_SWITCH)
+    if (led_sw == 1){
+#endif
 #if defined (KEY_LED_CONTROL)
         init_led();
 #if defined(KEY_LED_SELF)
     touch_led_on(255);
 #endif
 #endif      //KEY_LED_CONTROL
+#if defined (LED_SWITCH)
+    }
+#endif
     enable_irq(data->irq);
 
 }

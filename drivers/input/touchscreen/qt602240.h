@@ -49,6 +49,8 @@
 #define KEYLED_DATA_30MAX                2
 #define KEYLED_DATA_15MAX                3
 #define KEYLED_DATA_LOW                   4
+#define LED_SWITCH
+
 #endif
 
 #define IRQ_TOUCH_INT       IRQ_EINT_GROUP(18, 5)	// group 18 : J0
