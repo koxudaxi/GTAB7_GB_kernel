@@ -191,7 +191,10 @@ static ssize_t key_led_store(struct device *dev, struct device_attribute *attr,
         printk(KERN_ERR"[TSP] keyled write error\n");
     }
 
-    touch_led_on(i);
+#if defined (LED_SWITCH)
+    if(led_sw == 1)
+#endif
+        touch_led_on(i);
 
     return size;
 }
