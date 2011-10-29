@@ -198,7 +198,7 @@ static DEVICE_ATTR(brightness, S_IRUGO | S_IWUSR, NULL, key_led_store);
 static void p1_touchkey_bln_enable(void)
 {
    init_led();
-   touch_led_on(1);
+   touch_led_on(255);
 }
 
 static void p1_touchkey_bln_disable(void)
