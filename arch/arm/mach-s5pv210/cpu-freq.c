@@ -322,6 +322,9 @@ int s5pv210_lock_dvfs_high_level(uint nToken, uint perf_level)
 	if (perf_level > (MAX_PERF_LEVEL - 1))
 		return 0;
 
+	if (freq_table[perf_level].frequency > cpu_policy->max)
+		return 0;
+
 	//mutex_lock(&dvfs_high_lock);
 
 	g_dvfs_high_lock_token |= (1 << nToken);
