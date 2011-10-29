@@ -531,7 +531,7 @@ static int QT602240_Multitouch_Config_Init(struct qt602240_data *data)
 #else
     touchscreen_config.movfilter = 0x0b;              // Filter Limit[6:4] , Adapt threshold [3:0]
 #endif
-    touchscreen_config.numtouch= 0x05;
+    touchscreen_config.numtouch= 0x0a;
     touchscreen_config.tchdi = 0x02;
     touchscreen_config.mrghyst = 0x5;               // Merge hysteresis
     touchscreen_config.mrgthr = 0x5;//0xa            // Merge threshold
