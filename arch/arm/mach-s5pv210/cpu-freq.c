@@ -564,7 +564,7 @@ static int s5pv210_cpufreq_target(struct cpufreq_policy *policy,
         freq_uv_table[index][2] =(int) arm_volt / 1000;
 	int_volt = dvs_conf[index].int_volt;
 	
-	printk("setting vdd %d for speed %d\n", arm_volt, arm_clk);
+//	printk("setting vdd %d for speed %d\n", arm_volt, arm_clk);
 	
 	/* New clock information update */
 	memcpy(&s3c_freqs.new, &clk_info[index],
