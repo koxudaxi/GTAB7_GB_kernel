@@ -391,6 +391,8 @@ static void release_all_fingers(struct input_dev *input_dev)
 	    input_report_abs(input_dev, ABS_MT_POSITION_Y, fingerInfo[i].y);
 	    input_report_abs(input_dev, ABS_MT_TOUCH_MAJOR, fingerInfo[i].pressure);
 	    input_report_abs(input_dev, ABS_MT_WIDTH_MAJOR, fingerInfo[i].id);
+	    input_report_abs(input_dev, ABS_PRESSURE, fingerInfo[i].pressure);
+	    input_report_key(input_dev, BTN_TOUCH, 0);
 	    input_mt_sync(input_dev);
 
 	    if ( fingerInfo[i].pressure == 0 )
@@ -1238,10 +1240,16 @@ static void qt602240_input_read(struct qt602240_data *data)
 				input_report_abs(input_dev, ABS_MT_TOUCH_MAJOR, fingerInfo[i].pressure);
 				input_report_abs(input_dev, ABS_MT_WIDTH_MAJOR, fingerInfo[i].size);
 				input_report_abs(input_dev, ABS_MT_TRACKING_ID, fingerInfo[i].id);
-				input_mt_sync(input_dev);
+				input_report_abs(input_dev, ABS_MT_TOUCH_MAJOR, fingerInfo[i].pressure);
 
-				if (fingerInfo[i].pressure == 0 )
+				if (fingerInfo[i].pressure == 0 ) {
+					input_report_key(input_dev, BTN_TOUCH, 0);
 					fingerInfo[i].pressure= -1;
+				}
+				else
+					input_report_key(input_dev, BTN_TOUCH, 1);
+
+				input_mt_sync(input_dev);
 			}
 			input_sync(input_dev);
 		}
@@ -2212,6 +2220,8 @@ static int __devinit qt602240_probe(struct i2c_client *client,
     input_set_abs_params(input_dev, ABS_MT_TRACKING_ID,
             0, QT602240_MAX_ID, 0, 0);
 
+    input_set_abs_params(input_dev, ABS_PRESSURE,
+            0, QT602240_MAX_PRESSURE, 0, 0);
 
     input_dev->keycode = (void*)tsp_keycodes;
 
